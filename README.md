@@ -23,6 +23,7 @@
 | `docs/projects/` | 阶段性实战项目说明 |
 | `exercises/` | 每章课后练习（与正文分离） |
 | `playground/` | 实验代码与可跑最小示例（Memory / Eval harness 等） |
+| `interview/` | 面试题与答题笔记（与正文/练习分离） |
 
 ---
 
