@@ -2,20 +2,96 @@
 
 > 对应文档：[`docs/01-python-basics/03-modules-packages.md`](../../docs/01-python-basics/03-modules-packages.md)  
 > 状态：`已完成出题`  
-> 建议用时：60～100 分钟
+> 建议用时：70～110 分钟（含热身）
 
 ## 练习说明
 
-1. 本章以**搭包 + 跑通导入**为主，请在指定目录创建真实文件。
-2. 题目分档：**基础（必做） / 进阶（建议） / 挑战（可选）**。
-3. 建议根目录：
+1. 先读完文档「必掌握」再做题。本章以**搭包 + 跑通导入**为主，请在指定目录创建真实文件。
+2. 题目分档：**热身（建议先做） / 基础（必做） / 进阶（建议） / 挑战（可选）**。
+3. **热身题建议先做**：先弄清 `import` / `from ... import` / `__name__`，再搭 `chatkit` 包会轻松很多。
+4. 建议根目录：
 
 ```text
 playground/01-python-basics/03-modules-packages/
 ```
 
-4. 每做完一题，用命令行真正运行一次，不要只看代码“感觉没问题”。
-5. 先做题，再看文末提示。
+5. 每做完一题，用命令行真正运行一次，不要只看代码「感觉没问题」。
+6. 先自己做完，再看文末「提示与参考答案」。
+
+---
+
+## 热身题（建议先做）
+
+> 热身可在同一目录用极小文件完成；不必一开始就搭完整包。
+
+### W1. 最简单的 `import`
+
+**给定**：同目录两个文件 `mathy.py` 与 `w1_main.py`。
+
+**要求**：
+
+1. `mathy.py` 定义 `def double(x: int) -> int: return x * 2`
+2. `w1_main.py` 使用 `import mathy`，调用并打印结果
+
+**验收**：
+
+```bash
+cd playground/01-python-basics/03-modules-packages
+python w1_main.py
+```
+
+且 `mathy.double(21) == 42`。
+
+---
+
+### W2. `from ... import` 与别名
+
+**给定**：复用 `mathy.py`。
+
+**要求**：在 `w2_main.py` 里写 `from mathy import double as dup`，断言 `dup(3) == 6`。
+
+**验收**：`python w2_main.py` 无报错。
+
+---
+
+### W3. `__name__` 打印观察
+
+**给定**：在 `mathy.py` 末尾临时加：
+
+```python
+print("mathy __name__ =", __name__)
+```
+
+**要求**：分别执行 `python mathy.py` 与 `python -c "import mathy"`，观察两次 `__name__` 的差异，用一句话写结论。
+
+**验收**：能说出「直接运行是 `__main__`，被 import 时是模块名」。
+
+---
+
+### W4. 标准库三件套摸一眼
+
+**要求**：在 `w4_stdlib.py` 里各用一次：
+
+- `pathlib.Path.cwd()`
+- `json.dumps({"ok": True})`
+- `datetime.datetime.now(datetime.timezone.utc).isoformat()`
+
+**验收**：脚本可运行并打印三行可读输出。
+
+---
+
+### W5. 包目录最小骨架
+
+**要求**：创建空包：
+
+```text
+tinykit/
+└── __init__.py   # 可为空，或写 VERSION = "0.1.0"
+```
+
+再写 `w5_main.py`：`import tinykit` 并打印 `tinykit.VERSION`（若你写了）或 `tinykit.__file__`。
+
+**验收**：`python w5_main.py` 能导入成功。
 
 ---
 
@@ -41,7 +117,7 @@ def clip(text: str, max_len: int = 20) -> str:
     """超长则截断并加 ...（总长不超过 max_len）"""
 ```
 
-`b1_main.py` 使用 `import textkit`（不要 from import *），演示两次调用并打印结果。
+`b1_main.py` 使用 `import textkit`（不要 `from import *`），演示两次调用并打印结果。
 
 **验收**：
 
@@ -50,7 +126,7 @@ cd playground/01-python-basics/03-modules-packages
 python b1_main.py
 ```
 
-能输出合理结果；例如 `normalize("  a   b  ")` → `"a b"`。
+例如 `normalize("  a   b  ")` → `"a b"`。
 
 ---
 
@@ -66,11 +142,10 @@ python b1_main.py
     └── formatters.py
 ```
 
-要求：
+**要求**：
 
 1. `messages.py`：`create_message(role, content) -> dict`
-2. `formatters.py`：`format_message(msg: dict) -> str`  
-   返回形如 `[user] hello`
+2. `formatters.py`：`format_message(msg: dict) -> str`，返回形如 `[user] hello`
 3. `chatkit/__init__.py` 再导出 `create_message`、`format_message`，并定义 `__all__`
 4. 另写 `b2_main.py`，只允许：
 
@@ -78,7 +153,7 @@ python b1_main.py
 from chatkit import create_message, format_message
 ```
 
-**验收**：`python b2_main.py` 打印至少一行格式化消息；`from chatkit import *` 时（可自行试）应只暴露你在 `__all__` 里声明的名字（不必写测试框架，手工确认即可）。
+**验收**：`python b2_main.py` 打印至少一行格式化消息；`from chatkit import *` 时只暴露 `__all__` 里声明的名字（手工确认即可）。
 
 ---
 
@@ -98,7 +173,7 @@ chatkit/
     └── calc.py
 ```
 
-要求：
+**要求**：
 
 1. `tools/search.py`：`search(query: str, top_k: int = 3) -> list[str]`
 2. `tools/calc.py`：`add(a: float, b: float) -> float`
@@ -137,7 +212,7 @@ python -m chatkit.tools.search
 python -c "from chatkit.tools.search import search; print('imported ok')"
 ```
 
-**验收**：方式 1 有 demo 输出；方式 2 只有 `imported ok`（不应再打印 search demo，或至少你能区分并说明行为是否符合预期）。
+**验收**：方式 1 有 demo 输出；方式 2 只有 `imported ok`。
 
 > Windows PowerShell 同样可在该目录执行上述命令。
 
@@ -198,9 +273,9 @@ def list_tools() -> list[str]: ...
 def call(name: str, **kwargs) -> dict: ...
 ```
 
-要求：
+**要求**：
 
-1. `chatkit/tools/__init__.py` 在导入时把 `search`、`add` 注册进 registry（注意避免笨重副作用；可接受学习阶段的简单做法）
+1. `chatkit/tools/__init__.py` 在导入时把 `search`、`add` 注册进 registry（学习阶段可接受简单副作用）
 2. `c1_main.py` 演示：`list_tools()`、成功 `call`、调用未知工具返回 `ok=False`
 3. 包的公共 API 依然清晰：外部不必深入知道内部文件名
 
@@ -210,7 +285,8 @@ def call(name: str, **kwargs) -> dict: ...
 
 ## 验收标准（本章通过线）
 
-- [ ] B1～B4 全部完成，命令行实际跑通
+- [ ] （建议）热身题 W1～W5 先做完
+- [ ] **通过线**：B1～B4 全部完成，命令行实际跑通
 - [ ] 能手绘（或口述）`chatkit/` 目录树，并说明谁导入谁
 - [ ] 能解释 `ModuleNotFoundError` / 相对导入报错的常见原因
 - [ ] （建议）A1 或 A2 至少完成 1 题
@@ -218,69 +294,393 @@ def call(name: str, **kwargs) -> dict: ...
 
 ---
 
-## 提示与参考思路（先做题再看）
+## 提示与参考答案（先做题再看）
 
-<details>
-<summary>B1 提示</summary>
+> 热身题答案偏短；基础题及以后每题先给**思路**，再给带详细注释的**参考实现**。包结构题请按目录真正落盘后再跑。
 
-`normalize` 可用 `" ".join(text.split())`。  
-`clip` 注意 `max_len` 小于 3 时的边界；学习阶段可要求 `max_len >= 3`。
+### W1 参考答案
 
-</details>
-
-<details>
-<summary>B2 提示</summary>
+`mathy.py`：
 
 ```python
-# chatkit/__init__.py
+def double(x: int) -> int:
+    return x * 2
+```
+
+`w1_main.py`：
+
+```python
+import mathy
+
+assert mathy.double(21) == 42
+print(mathy.double(21))
+```
+
+### W2 参考答案
+
+```python
+from mathy import double as dup
+
+assert dup(3) == 6
+print(dup(3))
+```
+
+### W3 参考答案
+
+```python
+# 直接 python mathy.py → __name__ == "__main__"
+# import mathy        → __name__ == "mathy"
+# 结论：用 if __name__ == "__main__": 区分「脚本入口」与「被导入」
+```
+
+### W4 参考答案
+
+```python
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+print(Path.cwd())
+print(json.dumps({"ok": True}))
+print(datetime.now(timezone.utc).isoformat())
+```
+
+### W5 参考答案
+
+`tinykit/__init__.py`：
+
+```python
+VERSION = "0.1.0"
+```
+
+`w5_main.py`：
+
+```python
+import tinykit
+
+print(tinykit.VERSION)
+print(tinykit.__file__)
+```
+
+### B1 思路 + 参考答案
+
+**思路**
+
+1. `normalize`：`strip` 后再 `" ".join(text.split())` 压缩空白。
+2. `clip`：若 `len(text) <= max_len` 原样返回；否则留给 `...` 三个字符，前面截断。
+3. 学习阶段可约定 `max_len >= 3`。
+
+**参考答案**
+
+`textkit.py`：
+
+```python
+def normalize(text: str) -> str:
+    """strip + 压缩连续空白为单空格。"""
+    return " ".join(text.split())
+
+
+def clip(text: str, max_len: int = 20) -> str:
+    """超长则截断并加 ...，总长不超过 max_len。"""
+    if max_len < 3:
+        raise ValueError("max_len must be >= 3")
+    if len(text) <= max_len:
+        return text
+    return text[: max_len - 3] + "..."
+```
+
+`b1_main.py`：
+
+```python
+import textkit
+
+assert textkit.normalize("  a   b  ") == "a b"
+assert textkit.clip("abcdefghij", max_len=8) == "abcde..."
+print(textkit.normalize("  hello   agent  "))
+print(textkit.clip("这是一段比较长的工具描述文本", max_len=12))
+```
+
+### B2 思路 + 参考答案
+
+**思路**
+
+1. 包内模块各司其职：`messages` 负责结构，`formatters` 负责展示。
+2. `__init__.py` 再导出，让调用方写 `from chatkit import ...`。
+3. `__all__` 控制 `import *` 暴露面。
+
+**参考答案**
+
+`chatkit/messages.py`：
+
+```python
+def create_message(role: str, content: str) -> dict:
+    cleaned = content.strip()
+    if not cleaned:
+        raise ValueError("content empty")
+    return {"role": role, "content": cleaned}
+```
+
+`chatkit/formatters.py`：
+
+```python
+def format_message(msg: dict) -> str:
+    return f"[{msg['role']}] {msg['content']}"
+```
+
+`chatkit/__init__.py`：
+
+```python
 from chatkit.messages import create_message
 from chatkit.formatters import format_message
 
 __all__ = ["create_message", "format_message"]
 ```
 
-也可在包内用相对导入：`from .messages import create_message`。
-
-</details>
-
-<details>
-<summary>B3 提示</summary>
-
-确保每个包目录都有 `__init__.py`。  
-在 `03-modules-packages/` 下运行，而不是在更深的子目录运行，否则可能找不到 `chatkit`。
-
-</details>
-
-<details>
-<summary>B4 提示</summary>
+`b2_main.py`：
 
 ```python
+from chatkit import create_message, format_message
+
+msg = create_message("user", "  hello  ")
+line = format_message(msg)
+assert line == "[user] hello"
+print(line)
+```
+
+### B3 思路 + 参考答案
+
+**思路**
+
+1. 每个包目录都要有 `__init__.py`。
+2. 在「包含 `chatkit` 的那一层」运行，而不是进到子目录再跑。
+3. `runtime` 用绝对导入，依赖关系一目了然。
+
+**参考答案**
+
+`chatkit/tools/search.py`：
+
+```python
+def search(query: str, top_k: int = 3) -> list[str]:
+    return [f"doc:{query}:{i}" for i in range(top_k)]
+
+
+if __name__ == "__main__":
+    # B4 也会用到这个入口
+    print(search("agent"))
+```
+
+`chatkit/tools/calc.py`：
+
+```python
+def add(a: float, b: float) -> float:
+    return a + b
+```
+
+`chatkit/tools/__init__.py`：
+
+```python
+from chatkit.tools.search import search
+from chatkit.tools.calc import add
+
+__all__ = ["search", "add"]
+```
+
+`chatkit/runtime.py`：
+
+```python
+from chatkit.messages import create_message
+from chatkit.tools import search, add
+
+
+def run_demo(query: str) -> list[dict]:
+    messages = [create_message("user", query)]
+    hits = search(query, top_k=3)
+    total = add(1, 2)
+    assistant = create_message(
+        "assistant",
+        f"检索到 {len(hits)} 条；1+2={total}",
+    )
+    messages.append(assistant)
+    return messages
+```
+
+`b3_main.py`：
+
+```python
+from chatkit.runtime import run_demo
+
+msgs = run_demo("RAG")
+assert msgs[0]["role"] == "user"
+assert "3" in msgs[1]["content"] or "检索到 3" in msgs[1]["content"]
+for m in msgs:
+    print(m)
+```
+
+### B4 思路 + 参考答案
+
+**思路**
+
+1. demo 代码放进 `if __name__ == "__main__":`，只有「作为主模块运行」才执行。
+2. 推荐 `python -m chatkit.tools.search`，保证包上下文正确。
+
+**参考答案**（`search.py` 末尾）：
+
+```python
+def search(query: str, top_k: int = 3) -> list[str]:
+    return [f"doc:{query}:{i}" for i in range(top_k)]
+
+
 if __name__ == "__main__":
     print(search("agent"))
 ```
 
-`python -m chatkit.tools.search` 的当前工作目录应是包含 `chatkit` 的那一层。
+验证：
 
-</details>
+```bash
+python -m chatkit.tools.search
+python -c "from chatkit.tools.search import search; print('imported ok')"
+```
 
-<details>
-<summary>A1 思路</summary>
+### A1 思路 + 参考答案
 
-直接 `python search.py` 时，`__package__` 往往是空的，相对导入没有“父母包”。  
-`python -m chatkit.tools.search` 会按包上下文加载。把报错原文记下来最有价值。
+**思路**
 
-</details>
+1. 相对导入需要「父母包」上下文（`__package__` 非空）。
+2. 直接 `python search.py` 时常把文件当顶层脚本，`from .calc` 会报错。
+3. `python -m chatkit.tools.search` 按包加载，相对导入可用。
 
-<details>
-<summary>A2 思路</summary>
+**参考答案片段**（`search.py`）：
 
-`datetime.now(timezone.utc).isoformat()`；`Path("snapshot.json").write_text(...)`。消息用 `create_message` 生成，保持练习连贯。
+```python
+from .calc import add
 
-</details>
 
-<details>
-<summary>C1 思路</summary>
+def search(query: str, top_k: int = 3) -> list[str]:
+    return [f"doc:{query}:{i}" for i in range(top_k)]
 
-模块级 dict 做 registry；`call` 里 `fn(**kwargs)` 并捕获异常。注册放在 `tools/__init__.py` 末尾即可。注意避免 `registry` 与 `tools` 循环导入：可让 `registry` 不导入 tools，只被 tools 导入。
 
-</details>
+def search_and_add(query: str) -> dict:
+    return {"hits": search(query), "sum": add(1, 2)}
+
+
+if __name__ == "__main__":
+    print(search("agent"))
+    print(search_and_add("agent"))
+```
+
+`notes_a1.md` 示例：
+
+```text
+直接 python search.py 报错类似：
+ImportError: attempted relative import with no known parent package
+
+原因：此时 __package__ 为空，相对导入不知道「同包」是谁。
+用 python -m chatkit.tools.search 时，模块以 chatkit.tools.search 加载，相对导入正常。
+```
+
+### A2 思路 + 参考答案
+
+**思路**
+
+1. UTC 时间用 `datetime.now(timezone.utc).isoformat()`。
+2. 消息与 search 复用 `chatkit`，保持练习连贯。
+3. `Path.write_text` 覆盖写入即可。
+
+**参考答案**
+
+```python
+import json
+from datetime import datetime, timezone
+from pathlib import Path
+
+from chatkit import create_message
+from chatkit.tools import search
+
+payload = {
+    "created_at": datetime.now(timezone.utc).isoformat(),
+    "demo_messages": [
+        create_message("user", "hello"),
+        create_message("assistant", "hi"),
+    ],
+    "search_preview": search("RAG", top_k=2),
+}
+
+path = Path("snapshot.json")
+path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+loaded = json.loads(path.read_text(encoding="utf-8"))
+print(loaded["created_at"])
+assert len(loaded["search_preview"]) == 2
+```
+
+### C1 思路 + 参考答案
+
+**思路**
+
+1. 模块级 dict 做 registry；`call` 里 `fn(**kwargs)` 并捕获异常。
+2. `registry` 不要反向 import `tools`，避免循环导入；由 `tools/__init__.py` 去 register。
+3. 这是 Agent「工具注册表」的最小形态：名字 → 可调用对象。
+
+**参考答案**
+
+`chatkit/registry.py`：
+
+```python
+from collections.abc import Callable
+
+ToolFn = Callable[..., object]
+
+_REGISTRY: dict[str, ToolFn] = {}
+
+
+def register(name: str, fn: ToolFn) -> None:
+    _REGISTRY[name] = fn
+
+
+def get(name: str) -> ToolFn:
+    if name not in _REGISTRY:
+        raise KeyError(name)
+    return _REGISTRY[name]
+
+
+def list_tools() -> list[str]:
+    return sorted(_REGISTRY)
+
+
+def call(name: str, **kwargs: object) -> dict:
+    fn = _REGISTRY.get(name)
+    if fn is None:
+        return {"name": name, "ok": False, "result": f"unknown tool: {name}"}
+    try:
+        return {"name": name, "ok": True, "result": fn(**kwargs)}
+    except Exception as exc:
+        return {"name": name, "ok": False, "result": str(exc)}
+```
+
+`chatkit/tools/__init__.py`（注册副作用）：
+
+```python
+from chatkit.tools.search import search
+from chatkit.tools.calc import add
+from chatkit import registry
+
+registry.register("search", search)
+registry.register("add", add)
+
+__all__ = ["search", "add"]
+```
+
+`c1_main.py`：
+
+```python
+import chatkit.tools  # noqa: F401  # 触发注册
+from chatkit import registry
+
+print("tools:", registry.list_tools())
+print(registry.call("search", query="Agent", top_k=2))
+print(registry.call("add", a=1, b=2))
+print(registry.call("browse", url="x"))
+
+assert "search" in registry.list_tools()
+assert registry.call("browse")["ok"] is False
+```
