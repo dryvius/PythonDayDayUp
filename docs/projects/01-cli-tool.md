@@ -3,7 +3,8 @@
 > 状态：`已完成实战说明`  
 > 建议时机：完成模块 01～03 后  
 > 建议工时：6～12 小时  
-> 推荐目录：`playground/projects/01-cli-tool/`
+> 推荐目录：`playground/projects/01-cli-tool/`  
+> 运行环境：Python ≥ 3.11（见 [`../CONVENTIONS.md`](../CONVENTIONS.md)）
 
 ## 项目目标
 
@@ -60,6 +61,18 @@ playground/projects/01-cli-tool/
 └── .gitignore
 ```
 
+## 起步建议（第一天）
+
+1. 建目录 + `pyproject.toml`（包名 `app`，脚本入口可选）  
+2. 先写 `scanner.scan_path(path) -> dict`，用 `pytest` + `tmp_path` 造 2～3 个文件跑绿  
+3. 再挂 `cli.py` / `__main__.py`；最后才加 `-v` 与 `pip install -e .`  
+
+必读章节（细则回文档，不在这里重讲）：
+
+- [项目结构](../03-engineering/01-project-structure.md)  
+- [测试](../03-engineering/03-testing.md)  
+- [Logging](../03-engineering/04-logging.md)  
+
 ## 里程碑
 
 - [ ] **M1**：`scanner.scan_path` 对临时目录返回正确计数；`pytest` 绿  
@@ -73,14 +86,24 @@ playground/projects/01-cli-tool/
 - [ ] 业务逻辑不写在 `cli.py` 里堆成一团  
 - [ ] 无密钥；无提交 `.venv`  
 
+## 常见易错
+
+| 坑 | 正确做法 |
+|----|----------|
+| 逻辑全塞在 `cli.py` | 纯函数进 `scanner.py`，CLI 只负责解析与退出码 |
+| 测试扫真实家目录 | 用 `tmp_path` 造最小夹具 |
+| 缺路径仍 `exit 0` | 约定：错误 → 非 0；成功 → 0 |
+| 默认 INFO 刷屏 | 默认 WARNING，`-v` 再升 INFO |
+| 跳过规则漏 `.venv` | 显式跳过列表，单测里造一个假 `.venv` |
+
 ## 延伸挑战
 
-- 用 `rich` 表格美化输出  
+- 用 `rich` 表格扩展输出  
 - 并行扫描大目录（`ProcessPoolExecutor`，注意模块 04 GIL 边界）  
 - 打包发布到 TestPyPI（了解即可）  
 
 ## 导航
 
 - 返回项目列表：[./README.md](./README.md)
-- 相关文档：[模块 03 工程化](../03-engineering/README.md)
+- 相关文档：[模块 03 工程化](../03-engineering/README.md) · [语法基础](../01-python-basics/01-syntax-basics.md)
 - 返回总览：[../../README.md](../../README.md)

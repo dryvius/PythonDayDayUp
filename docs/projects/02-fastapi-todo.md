@@ -3,7 +3,8 @@
 > 状态：`已完成实战说明`  
 > 建议时机：完成模块 05～07 核心后（至少 FastAPI + SQL/ORM 入门）  
 > 建议工时：10～18 小时  
-> 推荐目录：`playground/projects/02-fastapi-todo/`
+> 推荐目录：`playground/projects/02-fastapi-todo/`  
+> 运行环境：Python ≥ 3.11（见 [`../CONVENTIONS.md`](../CONVENTIONS.md)）
 
 ## 项目目标
 
@@ -35,6 +36,7 @@
 - DB 为真源；重启不丢数据  
 - 至少健康检查 + 创建/列表的自动化测试  
 - 配置来自环境变量（`APP_API_KEY`、`DATABASE_URL`）  
+- 教学可用 `!=` 校验 API Key；生产应考虑恒定时间比较（见 CONVENTIONS）  
 
 ## 建议目录
 
@@ -57,6 +59,18 @@ playground/projects/02-fastapi-todo/
 └── README.md
 ```
 
+## 起步建议（第一天）
+
+1. SQLite + `create_all` 先跑通无鉴权 CRUD 与 `/docs`  
+2. 抽出 `schemas` / `service`，再加 `X-API-Key`  
+3. `TestClient` 覆盖：健康检查、创建、列表、错误 Key、缺 title  
+
+必读章节：
+
+- [FastAPI + Pydantic](../06-web-backend/02-fastapi-pydantic.md)  
+- [认证](../06-web-backend/03-auth.md)  
+- [ORM](../07-data-persistence/03-orm.md)  
+
 ## 里程碑
 
 - [ ] **M1**：内存或 SQLite；无鉴权 CRUD 跑通 + `/docs`  
@@ -68,7 +82,17 @@ playground/projects/02-fastapi-todo/
 - [ ] OpenAPI 中模型字段清晰  
 - [ ] 错误 Key → 401；缺 title → 422  
 - [ ] 测试不依赖手工清库（用 fixture / 事务回滚或独立测试 DB）  
-- [ ] 密钥仅环境变量  
+- [ ] 密钥仅环境变量；`.env` 不进仓库  
+
+## 常见易错
+
+| 坑 | 正确做法 |
+|----|----------|
+| 路由里直接操作 Session 堆业务 | router 薄、service 厚 |
+| 测试共用开发库互相污染 | 独立测试 DB 或事务回滚 fixture |
+| Key 写死在代码里 | `APP_API_KEY` 环境变量 + `.env.example` |
+| 把长任务塞进 `BackgroundTasks` | 本项目无长任务；记住 CONVENTIONS：长任务上队列 |
+| 只测 happy path | 至少覆盖 401 / 422 / 404 |
 
 ## 延伸挑战
 
